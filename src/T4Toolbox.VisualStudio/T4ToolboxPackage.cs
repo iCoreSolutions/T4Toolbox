@@ -7,7 +7,8 @@ namespace T4Toolbox.VisualStudio
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio;
+   using System.Threading;
+   using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.TextTemplating.VSHost;
     using T4Toolbox.DirectiveProcessors;
@@ -16,7 +17,7 @@ namespace T4Toolbox.VisualStudio
     /// <summary>
     /// Visual Studio Package of the T4 Toolbox extension.
     /// </summary>
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(AssemblyInfo.Product, AssemblyInfo.Description, AssemblyInfo.Version)]
     [Guid(T4ToolboxPackage.Id)]
 
@@ -38,13 +39,13 @@ namespace T4Toolbox.VisualStudio
     [ProvideCodeGenerator(typeof(ScriptFileGenerator), ScriptFileGenerator.Name, ScriptFileGenerator.Description, false, ProjectSystem = ProvideCodeGeneratorAttribute.VisualBasicProjectGuid)]
 
     // Auto-load the package for C# and Visual Basic projects to extend file properties 
-    [ProvideAutoLoad(VSConstants.UICONTEXT.CSharpProject_string)]
-    [ProvideAutoLoad(VSConstants.UICONTEXT.VBProject_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.CSharpProject_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.VBProject_string, PackageAutoLoadFlags.BackgroundLoad)]
 
     // Ensure VS experimental hive can find the extension dlls.
     [ProvideBindingPath]
 
-    public sealed class T4ToolboxPackage : Package, IDisposable
+    public sealed class T4ToolboxPackage : AsyncPackage, IDisposable
     {
         internal const string Id = "c88631b5-770c-453d-b90e-7136f127d57d";
         private readonly List<IDisposable> extenderProviders = new List<IDisposable>();
@@ -57,12 +58,12 @@ namespace T4Toolbox.VisualStudio
             this.Dispose(true);
         }
 
-        /// <summary>
-        /// Registers services implemented by this package.
-        /// </summary>
-        protected override void Initialize()
-        {
-            base.Initialize();
+      /// <summary>
+      /// Registers services implemented by this package.
+      /// </summary>
+      protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+      {
+            await base.InitializeAsync(cancellationToken, progress);
             TransformationContextProvider.Register(this);
             TemplateLocator.Register(this);
             this.extenderProviders.Add(new BrowseObjectExtenderProvider(this, PrjBrowseObjectCATID.prjCATIDCSharpFileBrowseObject));

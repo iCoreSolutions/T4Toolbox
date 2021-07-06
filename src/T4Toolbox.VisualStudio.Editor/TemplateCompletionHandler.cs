@@ -32,7 +32,7 @@ namespace T4Toolbox.VisualStudio.Editor
             Debug.Assert(this.NextHandler != null, "nextHandler");
             Debug.Assert(this.ServiceProvider != null, "serviceProvider");
             Debug.Assert(this.TextView != null, "textView");
-
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (VsShellUtilities.IsInAutomationFunction(this.ServiceProvider))
             {
                 return this.NextHandler.Exec(ref commandGroup, command, options, input, output);
@@ -93,6 +93,7 @@ namespace T4Toolbox.VisualStudio.Editor
 
         public int QueryStatus(ref Guid commandGroup, uint numberOfCommands, OLECMD[] commands, IntPtr commandText)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             Debug.Assert(this.NextHandler != null, "nextHandler");
             return this.NextHandler.QueryStatus(ref commandGroup, numberOfCommands, commands, commandText);
         }

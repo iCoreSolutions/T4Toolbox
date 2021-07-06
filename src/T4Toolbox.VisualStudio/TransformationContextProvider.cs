@@ -12,7 +12,8 @@ namespace T4Toolbox.VisualStudio
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using Microsoft.VisualStudio.TextTemplating.VSHost;
-    using T4Toolbox;
+   using Microsoft.VisualStudio.Threading;
+   using T4Toolbox;
 
     /// <summary>
     /// Implements the <see cref="ITransformationContextProvider"/> service.
@@ -119,8 +120,8 @@ namespace T4Toolbox.VisualStudio
                     defaultOutput.File = Path.GetFileName(args.FullPath);
                 }
 
-                // Finish updating the output files on the UI thread
-                ThreadHelper.Generic.BeginInvoke(manager.DoWork);
+               // Finish updating the output files on the UI thread                
+               ThreadHelper.Generic.BeginInvoke(manager.DoWork);
             };
 
             watcher.Created += runManager;

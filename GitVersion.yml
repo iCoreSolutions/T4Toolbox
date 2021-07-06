@@ -1,0 +1,9 @@
+mode: Mainline
+branches:
+  vs2019:
+    regex: '^vs2019$'
+    tag: ''
+    source-branches: ['master']
+ignore:
+  sha: []
+merge-message-formats: {}
